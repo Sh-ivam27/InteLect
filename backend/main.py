@@ -1,6 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+from routers import transcription as transcription_router
+from routers import rag as rag_router
+from routers import quiz as quiz_router
 
 load_dotenv()
 
@@ -17,6 +20,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(transcription_router.router, prefix="/api")
+app.include_router(rag_router.router, prefix="/api")
+app.include_router(quiz_router.router, prefix="/api")
 
 @app.get("/")
 def root():
