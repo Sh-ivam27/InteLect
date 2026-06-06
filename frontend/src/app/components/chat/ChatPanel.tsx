@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { askQuestion } from '@/lib/api';
 
 interface Message {
@@ -108,7 +109,19 @@ export default function ChatPanel({ videoId, onTimestampClick, onSourcesUpdate }
               lineHeight: '1.5',
               maxWidth: '85%',
             }}>
-              {msg.content}
+              {msg.role === 'ai' ? (
+                <ReactMarkdown
+                  components={{
+                    p: ({ children }) => <p style={{ margin: '0 0 6px 0' }}>{children}</p>,
+                    strong: ({ children }) => <strong style={{ color: 'var(--accent)' }}>{children}</strong>,
+                    code: ({ children }) => <code style={{ background: 'var(--bg-secondary)', padding: '1px 4px', borderRadius: '3px', fontSize: '11px' }}>{children}</code>,
+                  }}
+                >
+                  {msg.content}
+                </ReactMarkdown>
+              ) : (
+                msg.content
+              )}
             </div>
 
             {msg.sources && msg.sources.length > 0 && (
