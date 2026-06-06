@@ -14,9 +14,10 @@ interface Question {
 interface QuizPanelProps {
   videoId: string;
   onTimestampClick: (timestamp: number) => void;
+  onAnswer: (isCorrect: boolean, conceptName: string) => void;
 }
 
-export default function QuizPanel({ videoId, onTimestampClick }: QuizPanelProps) {
+export default function QuizPanel({ videoId, onTimestampClick, onAnswer }: QuizPanelProps) {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [feedback, setFeedback] = useState<Record<number, string>>({});
@@ -47,7 +48,12 @@ export default function QuizPanel({ videoId, onTimestampClick }: QuizPanelProps)
   const handleAnswer = async (questionIndex: number, answer: string) => {
     if (answers[questionIndex]) return;
     const q = questions[questionIndex];
+    const isCorrect = answer.toUpperCase() === q.correct.toUpperCase();
     setAnswers(prev => ({ ...prev, [questionIndex]: answer }));
+
+    // notify page.tsx about the answer
+    onAnswer(isCorrect, q.question.slice(0, 30));
+
     try {
       const result = await evaluateAnswer(
         q.question,

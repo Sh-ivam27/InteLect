@@ -1,5 +1,3 @@
-# routers facilitate the communication between the frontend and backend
-
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from services.transcription import transcribe_audio

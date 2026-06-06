@@ -3,7 +3,12 @@ import json
 
 client = Anthropic()
 
-def generate_quiz(chunks: list, num_questions: int = 5): # takes lecture chunks, formats them with timestamps and then sends them to Claude (with very specific instructions) to generate questions (by default, 5)
+def generate_quiz(chunks: list, num_questions: int = 5):
+    """
+    Takes lecture chunks, formats them with timestamps and sends them 
+    to Claude (with very specific instructions) to generate questions 
+    (by default 5).
+    """
     
     context = ""
     for chunk in chunks:
@@ -27,7 +32,7 @@ def generate_quiz(chunks: list, num_questions: int = 5): # takes lecture chunks,
 
 {context}
 
-Return ONLY a JSON array in this exact format, nothing else:
+Return ONLY a JSON array with no markdown, no code blocks, no extra text. Just the raw JSON array:
 [
     {{
         "question": "question text here",
@@ -41,16 +46,31 @@ Return ONLY a JSON array in this exact format, nothing else:
     )
     
     raw = response.content[0].text
-    questions = json.loads(raw)
+    
+    # strip markdown code blocks if Claude wraps in ```json
+    clean = raw.strip()
+    if clean.startswith("```"):
+        clean = clean.split("```")[1]
+        if clean.startswith("json"):
+            clean = clean[4:]
+    clean = clean.strip()
+    
+    questions = json.loads(clean)
     return questions
 
-def evaluate_answer(question: str, user_answer: str, correct_answer: str, explanation: str): # called whenever a user clicks an option button, checks if the user's answer matches the correct answer, also sends to Claude to generate encouraging personalized feedback
+def evaluate_answer(question: str, user_answer: str, correct_answer: str, explanation: str):
+    """
+    Called whenever a user clicks an option button, checks if the user's 
+    answer matches the correct answer, also sends to Claude to generate 
+    encouraging personalized feedback.
+    """
     
     response = client.messages.create(
         model="claude-opus-4-5",
         max_tokens=500,
         system="""You are a helpful tutor evaluating a student's answer.
-        Be encouraging but honest. Explain why they got it right or wrong.""",
+        Be encouraging but honest. Explain why they got it right or wrong.
+        Do not use markdown formatting. Write in plain text only.""",
         messages=[{
             "role": "user",
             "content": f"""Question: {question}

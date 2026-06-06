@@ -30,11 +30,14 @@ export default function Home() {
   const [answeredQuestions, setAnsweredQuestions] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
 
-  const handleVideoSubmit = async (url: string, vid: string) => { // kicks off the entire pipeline : user pastes URL -> hits "Load Lecture" button -> setVideoId(vid) -> VideoPlayer loads -> trannscribeVideo(url, vid) -> backend runs Whisper -> setChunks(result.chunks) -> transcript tab ready -> isLoading = false -> button goes back to normal
+  const handleVideoSubmit = async (url: string, vid: string) => {
     setIsLoading(true);
     setVideoId(vid);
     setChunks([]);
     setHighlightedTimestamps([]);
+    setAnsweredQuestions(0);
+    setCorrectAnswers(0);
+    setConcepts([]);
     try {
       const result = await transcribeVideo(url, vid);
       setChunks(result.chunks);
@@ -46,14 +49,36 @@ export default function Home() {
     }
   };
 
-  const handleTimestampClick = (timestamp: number) => { // seeks the video : called from either ChatPanel, QuizPanel or Transcript Tab -> uses the YouTube remote (player) to jump to that moment
+  const handleTimestampClick = (timestamp: number) => {
     if (player) {
       player.seekTo(timestamp, true);
     }
   };
 
-  const handleSourcesUpdate = (timestamps: number[]) => { // updates timestamp chips : called by ChatPanel after eveery Claude answer -> updates the chips shown below the video player
+  const handleSourcesUpdate = (timestamps: number[]) => {
     setHighlightedTimestamps(timestamps);
+  };
+
+  const handleQuizAnswer = (isCorrect: boolean, conceptName: string) => {
+    setAnsweredQuestions(prev => prev + 1);
+    if (isCorrect) {
+      setCorrectAnswers(prev => prev + 1);
+    }
+
+    setConcepts(prev => {
+      const existing = prev.find(c => c.name === conceptName);
+      if (existing) {
+        return prev.map(c =>
+          c.name === conceptName
+            ? { ...c, status: isCorrect ? 'confident' : 'shaky' }
+            : c
+        );
+      }
+      return [...prev, {
+        name: conceptName,
+        status: isCorrect ? 'confident' : 'shaky'
+      }];
+    });
   };
 
   const tabs = ['quiz', 'progress', 'transcript'] as const;
@@ -133,51 +158,51 @@ export default function Home() {
             overflowY: 'auto',
             padding: '12px 16px',
           }}>
-            {activeTab === 'quiz' && (
+            {/* Always mounted, just hidden */}
+            <div style={{ display: activeTab === 'quiz' ? 'block' : 'none' }}>
               <QuizPanel
                 videoId={videoId}
                 onTimestampClick={handleTimestampClick}
+                onAnswer={handleQuizAnswer}
               />
-            )}
+            </div>
 
-            {activeTab === 'progress' && (
+            <div style={{ display: activeTab === 'progress' ? 'block' : 'none' }}>
               <ProgressPanel
                 concepts={concepts}
                 totalChunks={chunks.length}
                 answeredQuestions={answeredQuestions}
                 correctAnswers={correctAnswers}
               />
-            )}
+            </div>
 
-            {activeTab === 'transcript' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                {chunks.length === 0 ? (
-                  <div style={{ color: 'var(--text-muted)', fontSize: '12px', textAlign: 'center', marginTop: '20px' }}>
-                    Load a lecture to see the transcript
+            <div style={{ display: activeTab === 'transcript' ? 'block' : 'none' }}>
+              {chunks.length === 0 ? (
+                <div style={{ color: 'var(--text-muted)', fontSize: '12px', textAlign: 'center', marginTop: '20px' }}>
+                  Load a lecture to see the transcript
+                </div>
+              ) : (
+                chunks.map((chunk, i) => (
+                  <div
+                    key={i}
+                    onClick={() => handleTimestampClick(chunk.start)}
+                    style={{
+                      display: 'flex',
+                      gap: '12px',
+                      padding: '4px 6px',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                    }}
+                  >
+                    <span style={{ color: 'var(--accent)', minWidth: '40px', fontSize: '11px' }}>
+                      {Math.floor(chunk.start / 60)}:{String(Math.floor(chunk.start % 60)).padStart(2, '0')}
+                    </span>
+                    <span style={{ color: 'var(--text-secondary)' }}>{chunk.text}</span>
                   </div>
-                ) : (
-                  chunks.map((chunk, i) => (
-                    <div
-                      key={i}
-                      onClick={() => handleTimestampClick(chunk.start)}
-                      style={{
-                        display: 'flex',
-                        gap: '12px',
-                        padding: '4px 6px',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                      }}
-                    >
-                      <span style={{ color: 'var(--accent)', minWidth: '40px', fontSize: '11px' }}>
-                        {Math.floor(chunk.start / 60)}:{String(Math.floor(chunk.start % 60)).padStart(2, '0')}
-                      </span>
-                      <span style={{ color: 'var(--text-secondary)' }}>{chunk.text}</span>
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
+                ))
+              )}
+            </div>
           </div>
         </div>
       </div>
