@@ -123,7 +123,7 @@ export default function Home() {
 
         {/* Bottom section - Tabs */}
         <div style={{
-          height: '220px',
+          height: '360px',
           background: 'var(--bg-tertiary)',
           borderTop: '1px solid var(--border)',
           display: 'flex',

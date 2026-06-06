@@ -48,7 +48,7 @@ export default function VideoPlayer({
           <YouTube
             videoId={videoId}
             opts={opts}
-            onReady={(e) => onPlayerReady(e.target)} // YouTube passes on the player to VideoPlayer which in turn passes the player to "page.tsx", then whenever user clicks on a particular timestamp, "page.tsx" triggers seekTo() and the video jumps to that moment
+            onReady={(e) => onPlayerReady(e.target)}
             style={{ width: '100%', height: '100%' }}
           />
         ) : (

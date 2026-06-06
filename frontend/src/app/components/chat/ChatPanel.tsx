@@ -58,7 +58,7 @@ export default function ChatPanel({ videoId, onTimestampClick, onSourcesUpdate }
 
   return (
     <div style={{
-      width: '320px',
+      width: '720px',
       background: 'var(--bg-secondary)',
       display: 'flex',
       flexDirection: 'column',
