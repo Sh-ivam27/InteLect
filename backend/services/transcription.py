@@ -1,42 +1,56 @@
-import whisper # helps in transcription of the .mp3 file into text with timestamps
-import yt_dlp # helps in downloading the YouTube video
+import assemblyai as aai
 import os
 import tempfile
+from dotenv import load_dotenv
+from pytubefix import YouTube
+
+load_dotenv()
+
+aai.settings.api_key = os.getenv("ASSEMBLYAI_API_KEY")
 
 def download_audio(youtube_url: str) -> str:
     temp_dir = tempfile.mkdtemp()
-    audio_path = os.path.join(temp_dir, "audio.mp3")
     
-    ydl_opts = {
-        'format': 'bestaudio/best',
-        'outtmpl': audio_path,
-        'postprocessors': [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
-        }],
-    }
-    
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([youtube_url])
+    yt = YouTube(youtube_url)
+    audio_stream = yt.streams.filter(only_audio=True).first()
+    audio_path = audio_stream.download(output_path=temp_dir, filename="audio.mp4")
     
     return audio_path
 
 def transcribe_audio(youtube_url: str) -> list:
     print("Downloading audio...")
-    audio_path = download_audio(youtube_url) # .mp3 file obtained
-    
-    print("Loading Whisper model...")
-    model = whisper.load_model("base") # "base" model used
+    audio_path = download_audio(youtube_url)
     
     print("Transcribing...")
-    result = model.transcribe(audio_path, verbose=False)
+    transcriber = aai.Transcriber()
+    transcript = transcriber.transcribe(audio_path)
     
-    chunks = [] # entire transcribed text is broken into chunks, where each chunk has a "start" time, "end" time and "text" associated with it
-    for segment in result["segments"]:
-        chunks.append({
-            "start": segment["start"],
-            "end": segment["end"],
-            "text": segment["text"].strip()
+    if transcript.status == aai.TranscriptStatus.error:
+        raise Exception(f"Transcription failed: {transcript.error}")
+    
+    sentence_chunks = []
+    current_chunk = {"start": None, "end": None, "text": ""}
+    
+    for i, word in enumerate(transcript.words):
+        if current_chunk["start"] is None:
+            current_chunk["start"] = word.start / 1000
+        
+        current_chunk["text"] += " " + word.text
+        current_chunk["end"] = word.end / 1000
+        
+        if (i + 1) % 20 == 0:
+            sentence_chunks.append({
+                "start": current_chunk["start"],
+                "end": current_chunk["end"],
+                "text": current_chunk["text"].strip()
+            })
+            current_chunk = {"start": None, "end": None, "text": ""}
+    
+    if current_chunk["text"].strip():
+        sentence_chunks.append({
+            "start": current_chunk["start"],
+            "end": current_chunk["end"],
+            "text": current_chunk["text"].strip()
         })
     
-    return chunks
+    return sentence_chunks
