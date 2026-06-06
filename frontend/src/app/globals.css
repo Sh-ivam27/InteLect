@@ -41,8 +41,3 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent);
 }
-
-.yt-iframe {
-  width: 100% !important;
-  height: 100% !important;
-}

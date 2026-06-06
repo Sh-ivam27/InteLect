@@ -24,7 +24,6 @@ export default function Home() {
   const [chunks, setChunks] = useState<Chunk[]>([]);
   const [player, setPlayer] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [highlightedTimestamps, setHighlightedTimestamps] = useState<number[]>([]);
   const [activeTab, setActiveTab] = useState<'quiz' | 'progress' | 'transcript'>('quiz');
   const [concepts, setConcepts] = useState<Concept[]>([]);
   const [answeredQuestions, setAnsweredQuestions] = useState(0);
@@ -34,7 +33,6 @@ export default function Home() {
     setIsLoading(true);
     setVideoId(vid);
     setChunks([]);
-    setHighlightedTimestamps([]);
     setAnsweredQuestions(0);
     setCorrectAnswers(0);
     setConcepts([]);
@@ -53,10 +51,6 @@ export default function Home() {
     if (player) {
       player.seekTo(timestamp, true);
     }
-  };
-
-  const handleSourcesUpdate = (timestamps: number[]) => {
-    setHighlightedTimestamps(timestamps);
   };
 
   const handleQuizAnswer = (isCorrect: boolean, conceptName: string) => {
@@ -111,13 +105,11 @@ export default function Home() {
           <VideoPlayer
             videoId={videoId}
             chunks={chunks}
-            highlightedTimestamps={highlightedTimestamps}
             onPlayerReady={setPlayer}
           />
           <ChatPanel
             videoId={videoId}
             onTimestampClick={handleTimestampClick}
-            onSourcesUpdate={handleSourcesUpdate}
           />
         </div>
 
@@ -158,7 +150,6 @@ export default function Home() {
             overflowY: 'auto',
             padding: '12px 16px',
           }}>
-            {/* Always mounted, just hidden */}
             <div style={{ display: activeTab === 'quiz' ? 'block' : 'none' }}>
               <QuizPanel
                 videoId={videoId}

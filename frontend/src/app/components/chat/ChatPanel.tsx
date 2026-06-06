@@ -59,14 +59,19 @@ export default function ChatPanel({ videoId, onTimestampClick, onSourcesUpdate }
   return (
     <div style={{
       width: '720px',
+      minWidth: '720px',
+      maxWidth: '720px',
       background: 'var(--bg-secondary)',
       display: 'flex',
       flexDirection: 'column',
       borderLeft: '1px solid var(--border)',
+      overflow: 'hidden',
+      minHeight: 0,
     }}>
       <div style={{
         padding: '12px 14px',
         borderBottom: '1px solid var(--border)',
+        flexShrink: 0,
       }}>
         <div style={{ fontSize: '13px', fontWeight: 600, color: 'white' }}>Ask anything</div>
         <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
@@ -81,6 +86,7 @@ export default function ChatPanel({ videoId, onTimestampClick, onSourcesUpdate }
         flexDirection: 'column',
         gap: '10px',
         overflowY: 'auto',
+        minHeight: 0,
       }}>
         {messages.length === 0 && (
           <div style={{
@@ -164,6 +170,7 @@ export default function ChatPanel({ videoId, onTimestampClick, onSourcesUpdate }
         borderTop: '1px solid var(--border)',
         display: 'flex',
         gap: '6px',
+        flexShrink: 0,
       }}>
         <input
           type="text"
