@@ -9,4 +9,3 @@ langchain-text-splitters
 chromadb
 pydantic
 requests
-youtube-transcript-api
