@@ -6,7 +6,6 @@ load_dotenv()
 def transcribe_audio(youtube_url: str) -> list:
     print("Fetching transcript...")
     
-    # extract video id from URL
     if "v=" in youtube_url:
         video_id = youtube_url.split("v=")[1].split("&")[0]
     elif "youtu.be/" in youtube_url:
@@ -15,7 +14,7 @@ def transcribe_audio(youtube_url: str) -> list:
         raise Exception("Invalid YouTube URL")
     
     ytt_api = YouTubeTranscriptApi()
-    transcript = ytt_api.fetch(video_id)    
+    transcript = ytt_api.fetch(video_id)
     
     sentence_chunks = []
     current_chunk = {"start": None, "end": None, "text": ""}
@@ -24,10 +23,10 @@ def transcribe_audio(youtube_url: str) -> list:
     for entry in transcript:
         if current_chunk["start"] is None:
             current_chunk["start"] = entry.start
-    
-    current_chunk["text"] += " " + entry.text
-    current_chunk["end"] = entry.start + entry.duration
-    word_count += len(entry.text.split())
+        
+        current_chunk["text"] += " " + entry.text
+        current_chunk["end"] = entry.start + entry.duration
+        word_count += len(entry.text.split())
         
         if word_count >= 150:
             sentence_chunks.append({
