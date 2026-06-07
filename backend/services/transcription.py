@@ -23,11 +23,11 @@ def transcribe_audio(youtube_url: str) -> list:
     
     for entry in transcript:
         if current_chunk["start"] is None:
-            current_chunk["start"] = entry["start"]
-        
-        current_chunk["text"] += " " + entry["text"]
-        current_chunk["end"] = entry["start"] + entry["duration"]
-        word_count += len(entry["text"].split())
+            current_chunk["start"] = entry.start
+    
+    current_chunk["text"] += " " + entry.text
+    current_chunk["end"] = entry.start + entry.duration
+    word_count += len(entry.text.split())
         
         if word_count >= 150:
             sentence_chunks.append({
