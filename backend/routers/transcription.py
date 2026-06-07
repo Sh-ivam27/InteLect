@@ -21,4 +21,5 @@ def transcribe(request: TranscribeRequest):
             "num_chunks": num_chunks
         }
     except Exception as e:
+        print(f"TRANSCRIPTION ERROR: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
