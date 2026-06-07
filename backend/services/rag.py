@@ -84,3 +84,30 @@ def ask_question(question: str, video_id: str): # calls query_chunks to get the 
         "answer": response.content[0].text,
         "sources": relevant_chunks
     }
+def get_all_chunks(video_id: str) -> list:
+    """
+    Returns all chunks stored in ChromaDB for a given video
+    so we can sample evenly across the entire video for quiz generation
+    """
+    collection = create_collection(video_id)
+    
+    # get count first
+    count = collection.count()
+    
+    if count == 0:
+        return []
+    
+    # get all chunks
+    results = collection.get(
+        include=["documents", "metadatas"]
+    )
+    
+    chunks = []
+    for i, doc in enumerate(results["documents"]):
+        chunks.append({
+            "text": doc,
+            "start": results["metadatas"][i]["start"],
+            "end": results["metadatas"][i]["end"]
+        })
+    
+    return chunks
