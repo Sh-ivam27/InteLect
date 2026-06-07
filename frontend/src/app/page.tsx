@@ -107,7 +107,7 @@ export default function Home() {
             chunks={chunks}
             onPlayerReady={setPlayer}
           />
-          <ChatPanel
+          <ChatPanel 
             videoId={videoId}
             onTimestampClick={handleTimestampClick}
           />

@@ -14,8 +14,8 @@ def store_chunks(chunks: list, video_id: str): # takes the raw "Whisper" chunks 
     collection = create_collection(video_id)
     
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500,
-        chunk_overlap=50
+        chunk_size=1000,
+        chunk_overlap=150
     )
     
     documents = []

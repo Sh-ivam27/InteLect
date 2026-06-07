@@ -13,10 +13,9 @@ interface Message {
 interface ChatPanelProps {
   videoId: string;
   onTimestampClick: (timestamp: number) => void;
-  onSourcesUpdate: (timestamps: number[]) => void;
 }
 
-export default function ChatPanel({ videoId, onTimestampClick, onSourcesUpdate }: ChatPanelProps) {
+export default function ChatPanel({ videoId, onTimestampClick }: ChatPanelProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -43,9 +42,6 @@ export default function ChatPanel({ videoId, onTimestampClick, onSourcesUpdate }
         sources: result.sources,
       };
       setMessages(prev => [...prev, aiMessage]);
-      if (result.sources) {
-        onSourcesUpdate(result.sources.map((s: any) => s.start));
-      }
     } catch (error) {
       setMessages(prev => [...prev, {
         role: 'ai',
