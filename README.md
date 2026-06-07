@@ -3,8 +3,6 @@
 
 InteLect is an AI-powered platform that turns any YouTube lecture into an interactive course. Paste a YouTube URL and get a timestamped transcript, ask questions grounded to specific moments in the video, generate understanding-based quizzes, and track your progress — all in one place.
 
-🔗 **Live Demo:** https://inte-lect.vercel.app
-
 ---
 
 ## Features
