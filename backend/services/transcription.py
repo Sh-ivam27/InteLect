@@ -14,7 +14,8 @@ def transcribe_audio(youtube_url: str) -> list:
     else:
         raise Exception("Invalid YouTube URL")
     
-    transcript = YouTubeTranscriptApi.get_transcript(video_id)
+    ytt_api = YouTubeTranscriptApi()
+    transcript = ytt_api.fetch(video_id)    
     
     sentence_chunks = []
     current_chunk = {"start": None, "end": None, "text": ""}
