@@ -1,16 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
 :root {
-  --bg-primary: #0F1117;
-  --bg-secondary: #1A1D27;
-  --bg-tertiary: #13151F;
+  --bg-primary: #080B12;
+  --bg-secondary: #0C1018;
+  --bg-tertiary: #090D15;
+  --bg-card: #111620;
   --accent: #4F8EF7;
-  --accent-hover: #3B7DE8;
-  --border: #2A2D3A;
-  --text-primary: #CCD6F6;
-  --text-secondary: #888;
-  --text-muted: #555;
-  --success: #10B981;
+  --accent-dim: #0E1829;
+  --accent-border: #1E3055;
+  --accent-glow: rgba(79, 142, 247, 0.25);
+  --border: #1A2030;
+  --border-subtle: #1E2535;
+  --text-primary: #E2E8F0;
+  --text-secondary: #94A3B8;
+  --text-muted: #334155;
+  --text-mono: #CBD5E1;
+  --success: #22C55E;
+  --success-bg: #0D2419;
+  --success-border: #166534;
+  --danger: #EF4444;
+  --danger-bg: #200D0D;
+  --danger-border: #7F1D1D;
+  --font-sans: 'DM Sans', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
 * {
@@ -22,22 +35,18 @@
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
 
-::-webkit-scrollbar {
-  width: 6px;
-}
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
-::-webkit-scrollbar-track {
-  background: var(--bg-primary);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--accent);
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
