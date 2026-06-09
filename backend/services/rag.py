@@ -10,12 +10,12 @@ chroma_client = chromadb.Client()
 def create_collection(video_id: str): # creates "buckets" for each video in the ChromaDB so that chunks dont mix between videos
     return chroma_client.get_or_create_collection(name=f"video_{video_id}")
 
-def store_chunks(chunks: list, video_id: str): # takes the raw "Whisper" chunks and then re-chunks them smartly into meaningful chunks (~500 words) and stores them in ChromaDB with their timestamps
+def store_chunks(chunks: list, video_id: str):
     collection = create_collection(video_id)
     
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=150
+        chunk_size=1500,
+        chunk_overlap=200
     )
     
     documents = []
@@ -24,11 +24,20 @@ def store_chunks(chunks: list, video_id: str): # takes the raw "Whisper" chunks 
     
     for i, chunk in enumerate(chunks):
         split_texts = text_splitter.split_text(chunk["text"])
+        num_splits = len(split_texts)
+        seg_duration = chunk["end"] - chunk["start"]
+        
         for j, text in enumerate(split_texts):
+            # interpolate start/end within the parent segment
+            frac_start = j / num_splits
+            frac_end = (j + 1) / num_splits
+            interpolated_start = chunk["start"] + frac_start * seg_duration
+            interpolated_end = chunk["start"] + frac_end * seg_duration
+            
             documents.append(text)
             metadatas.append({
-                "start": chunk["start"],
-                "end": chunk["end"],
+                "start": interpolated_start,
+                "end": interpolated_end,
                 "video_id": video_id
             })
             ids.append(f"{video_id}_{i}_{j}")
@@ -71,9 +80,13 @@ def ask_question(question: str, video_id: str): # calls query_chunks to get the 
         model="claude-opus-4-5",
         max_tokens=1024,
         system="""You are an intelligent tutor helping students understand lecture content.
-        Answer questions based ONLY on the provided transcript chunks.
-        Always cite the timestamp where the answer comes from.
-        If the answer isn't in the transcript, say so clearly.""",
+        Answer questions based primarily on the provided transcript chunks.
+        If the question is closely related to the topic but not explicitly covered in the transcript, 
+        you may use your general knowledge to answer — but clearly indicate when you are doing so.
+        Always cite the timestamp where relevant content appears in the transcript.
+        If the question is completely unrelated to the lecture topic, say so clearly.
+        Do not use markdown formatting like ** or ## in your responses.
+        Write in plain, clear text.""",
         messages=[{
             "role": "user",
             "content": f"Context from lecture:\n{context}\n\nQuestion: {question}"

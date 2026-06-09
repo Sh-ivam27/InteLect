@@ -1,9 +1,7 @@
-# routers facilitate the communication between the frontend and backend
-
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from services.quiz import generate_quiz, evaluate_answer
-from services.rag import query_chunks
+from services.rag import get_all_chunks
 
 router = APIRouter()
 
@@ -17,11 +15,33 @@ class EvaluateRequest(BaseModel):
     correct_answer: str
     explanation: str
 
+def _uniform_sample(chunks: list, n: int) -> list:
+    if len(chunks) <= n:
+        return chunks
+    indices = [round(i * (len(chunks) - 1) / (n - 1)) for i in range(n)]
+    seen = set()
+    result = []
+    for idx in indices:
+        if idx not in seen:
+            seen.add(idx)
+            result.append(chunks[idx])
+    return result
+
 @router.post("/quiz/generate")
 def generate(request: QuizRequest):
     try:
-        chunks = query_chunks("main concepts", request.video_id, n_results=10)
-        questions = generate_quiz(chunks, request.num_questions)
+        all_chunks = get_all_chunks(request.video_id)
+
+        if not all_chunks:
+            raise Exception("No chunks found for this video. Please transcribe first.")
+
+        all_chunks.sort(key=lambda x: x["start"])
+        print([(c["start"], c["end"]) for c in all_chunks[:5]])
+        print(f"total: {len(all_chunks)}, last start: {all_chunks[-1]['start']}")
+
+        sampled = _uniform_sample(all_chunks, min(20, len(all_chunks)))
+        questions = generate_quiz(sampled, request.num_questions)
+
         return {
             "success": True,
             "video_id": request.video_id,
