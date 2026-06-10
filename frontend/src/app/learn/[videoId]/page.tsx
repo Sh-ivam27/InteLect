@@ -137,7 +137,7 @@ export default function LearnPage() {
             background: '#050608',
             borderBottom: '1px solid var(--border)',
             width: '100%',
-            height: 'clamp(200px, 54vh, 540px)',
+            height: 'clamp(200px, 50vh, 500px)',
             position: 'relative',
           }}>
             <div style={{
