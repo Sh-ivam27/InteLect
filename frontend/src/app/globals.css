@@ -1,35 +1,51 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
 :root {
-  --bg-primary: #080B12;
-  --bg-secondary: #0C1018;
-  --bg-tertiary: #090D15;
-  --bg-card: #111620;
-  --accent: #4F8EF7;
-  --accent-dim: #0E1829;
-  --accent-border: #1E3055;
-  --accent-glow: rgba(79, 142, 247, 0.25);
-  --border: #1A2030;
-  --border-subtle: #1E2535;
-  --text-primary: #E2E8F0;
-  --text-secondary: #94A3B8;
-  --text-muted: #334155;
-  --text-mono: #CBD5E1;
-  --success: #22C55E;
-  --success-bg: #0D2419;
-  --success-border: #166534;
-  --danger: #EF4444;
-  --danger-bg: #200D0D;
-  --danger-border: #7F1D1D;
-  --font-sans: 'DM Sans', -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  /* Backgrounds */
+  --bg-primary:   #080910;
+  --bg-secondary: #0C0D16;
+  --bg-tertiary:  #09091200;
+  --bg-card:      #10111C;
+
+  /* Indigo accent */
+  --accent:        #7F77DD;
+  --accent-dim:    #1A183A;
+  --accent-border: #2E2A5C;
+  --accent-glow:   rgba(127, 119, 221, 0.2);
+
+  /* Borders */
+  --border:        #1A1B28;
+  --border-subtle: #1E2030;
+
+  /* Text */
+  --text-primary:  #E8E6F0;
+  --text-secondary: #8A8AA8;
+  --text-muted:    #3A3A52;
+  --text-mono:     #C4C2D8;
+
+  /* Semantic */
+  --success:        #1D9E75;
+  --success-bg:     #0A1F18;
+  --success-border: #0F3D2E;
+  --danger:         #D85A30;
+  --danger-bg:      #1F100A;
+  --danger-border:  #5A2A12;
+
+  /* Typography */
+  --font-display: 'Syne', -apple-system, sans-serif;
+  --font-sans:    'DM Sans', -apple-system, sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
 }
 
-* {
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+html, body {
+  height: 100%;
 }
 
 body {
@@ -37,16 +53,33 @@ body {
   color: var(--text-primary);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-::-webkit-scrollbar { width: 4px; }
+/* Scrollbar */
+::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* YouTube iframe fill */
+.yt-iframe {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+.yt-iframe {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  border: none;
 }
